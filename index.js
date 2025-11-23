@@ -4,7 +4,7 @@ const { Client, Collection, GatewayIntentBits, Partials } = require('discord.js'
 require('dotenv').config();
 
 
-const config = require('./config.json');
+const config = require('./config.js');
 
 
 const client = new Client({
@@ -63,6 +63,7 @@ if (interaction.replied || interaction.deferred) await interaction.followUp({ co
 else await interaction.reply({ content: 'Erreur lors de l\'exécution.', ephemeral: true });
 }
 });
+
 
 
 client.login(config.token);
