@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const config = require('../config.json');
+const config = require('../config.js');
 
 // Retourne le channel de logs
 function getLogChannel(client) {
@@ -50,3 +50,4 @@ module.exports = {
     await ch.send({ embeds: [embed] }).catch(() => {});
   }
 };
+
