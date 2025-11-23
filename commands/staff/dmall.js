@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const config = require('../../config.json');
+const config = require('../../config.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -24,3 +24,4 @@ module.exports = {
     await interaction.reply({ content: `✅ Message envoyé à ${sentCount} membres.`, ephemeral: true });
   }
 };
+
