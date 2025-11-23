@@ -84,13 +84,12 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 
-// Répond quand le bot est mentionné
 client.on(Events.MessageCreate, async (message) => {
     // Ignore les bots
     if (message.author.bot) return;
 
-    // Si le bot est mentionné
-    if (message.mentions.has(client.user)) {
+    // Si le bot est mentionné directement et ce n'est pas une réponse
+    if (message.mentions.has(client.user) && !message.reference) {
         try {
             await message.reply("C'est moi wshh");
         } catch (err) {
@@ -102,4 +101,5 @@ client.on(Events.MessageCreate, async (message) => {
 
 // Login
 client.login(config.token);
+
 
