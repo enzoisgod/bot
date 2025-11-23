@@ -1,7 +1,7 @@
 {
   "name": "effexe-core",
   "version": "1.0.0",
-  "description": "Bot Discord de la team Effexe - commandes modération, fun et utilitaires.",
+  "description": "Bot Discord de la team Effexe - modération, fun, utilitaires",
   "main": "index.js",
   "engines": {
     "node": ">=18.0.0"
