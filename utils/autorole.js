@@ -1,4 +1,4 @@
-const config = require('../config.json');
+const config = require('../config.js');
 
 
 module.exports = {
@@ -25,4 +25,5 @@ await member.roles.remove(roleId).catch(()=>{});
 }
 }
 }
+
 };
