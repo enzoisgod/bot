@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const config = require('../../config.json');
+const config = require('../../config.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -27,4 +27,5 @@ module.exports = {
 
     await interaction.reply({ embeds: [embed], ephemeral: true });
   }
+
 };
