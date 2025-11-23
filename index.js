@@ -84,6 +84,22 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 
+// Répond quand le bot est mentionné
+client.on(Events.MessageCreate, async (message) => {
+    // Ignore les bots
+    if (message.author.bot) return;
+
+    // Si le bot est mentionné
+    if (message.mentions.has(client.user)) {
+        try {
+            await message.reply("C'est moi wshh");
+        } catch (err) {
+            console.error("Impossible de répondre au ping :", err);
+        }
+    }
+});
+
 
 // Login
 client.login(config.token);
+
