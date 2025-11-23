@@ -15,9 +15,13 @@ module.exports = {
 
         let i = 0;
         setInterval(() => {
-            const status = statuses[i % statuses.length];
-            client.user.setActivity(status.name, { type: status.type }).catch(console.error);
-            i++;
+            try {
+                const status = statuses[i % statuses.length];
+                client.user.setActivity(status.name, { type: status.type });
+                i++;
+            } catch (err) {
+                console.error("Erreur en changeant le statut :", err);
+            }
         }, 5000); // change toutes les 5 secondes
     }
 };
