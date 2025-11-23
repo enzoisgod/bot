@@ -1,15 +1,21 @@
 {
-"name": "effexe-core",
-"version": "1.0.0",
-"main": "index.js",
-"engines": {
-"node": ">=18.0.0"
-},
-"dependencies": {
-"discord.js": "^14.16.0",
-"@discordjs/rest": "^1.5.0",
-"discord-api-types": "^0.37.40",
-"dotenv": "^16.0.0",
-"winston": "^3.8.2"
-}
+  "name": "effexe-core",
+  "version": "1.0.0",
+  "description": "Bot Discord de la team Effexe - commandes modération, fun et utilitaires.",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "deploy-commands": "node deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.0",
+    "@discordjs/rest": "^1.5.0",
+    "discord-api-types": "^0.37.40",
+    "dotenv": "^16.0.0",
+    "winston": "^3.8.2",
+    "node-fetch": "^2.6.9"
+  }
 }
