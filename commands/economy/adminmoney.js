@@ -1,49 +1,44 @@
 const fs = require('fs');
 const path = require('path');
 
-// ⚠️ IMPORTANT : un seul fichier pour TOUTE l’économie
-const filePath = path.join(__dirname, '../data/economy.json');
+const filePath = path.join(__dirname, '../data/economie.json');
 
-// Crée le fichier si il existe pas
+// Vérifie que le fichier existe, sinon le créer
 if (!fs.existsSync(filePath)) {
     fs.writeFileSync(filePath, JSON.stringify({}, null, 4));
 }
 
-// Charge
+// Charge les données
 function load() {
-    try {
-        return JSON.parse(fs.readFileSync(filePath));
-    } catch {
-        return {};
-    }
+    return JSON.parse(fs.readFileSync(filePath));
 }
 
-// Sauvegarde
+// Sauvegarde les données
 function save(data) {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
 }
 
-// GET
+// Récupère le balance d’un utilisateur
 function getBalance(userId) {
     const data = load();
     return data[userId] || 0;
 }
 
-// SET
+// Modifie le balance d’un utilisateur
 function setBalance(userId, amount) {
     const data = load();
     data[userId] = amount;
     save(data);
 }
 
-// ADD
+// Ajoute un montant
 function addBalance(userId, amount) {
     const data = load();
     data[userId] = (data[userId] || 0) + amount;
     save(data);
 }
 
-// REMOVE
+// Retire un montant
 function removeBalance(userId, amount) {
     const data = load();
     data[userId] = Math.max(0, (data[userId] || 0) - amount);
