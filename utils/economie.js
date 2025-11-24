@@ -10,38 +10,63 @@ if (!fs.existsSync(filePath)) {
 
 // Charge les données
 function load() {
-    return JSON.parse(fs.readFileSync(filePath));
+    try {
+        const raw = fs.readFileSync(filePath);
+        return JSON.parse(raw);
+    } catch (err) {
+        console.error("Erreur lors du chargement de l'économie :", err);
+        return {};
+    }
 }
 
 // Sauvegarde les données
 function save(data) {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
+    } catch (err) {
+        console.error("Erreur lors de la sauvegarde de l'économie :", err);
+    }
+}
+
+// Initialise un utilisateur si nécessaire
+function initUser(userId) {
+    const data = load();
+    if (!data[userId]) {
+        data[userId] = { money: 0, lastDaily: null };
+        save(data);
+    }
+    return data[userId];
 }
 
 // Récupère le balance d’un utilisateur
 function getBalance(userId) {
-    const data = load();
-    return data[userId] || 0;
+    return initUser(userId).money;
 }
 
 // Modifie le balance d’un utilisateur
 function setBalance(userId, amount) {
+    const user = initUser(userId);
+    user.money = amount;
     const data = load();
-    data[userId] = amount;
+    data[userId] = user;
     save(data);
 }
 
 // Ajoute un montant
 function addBalance(userId, amount) {
+    const user = initUser(userId);
+    user.money += amount;
     const data = load();
-    data[userId] = (data[userId] || 0) + amount;
+    data[userId] = user;
     save(data);
 }
 
 // Retire un montant
 function removeBalance(userId, amount) {
+    const user = initUser(userId);
+    user.money = Math.max(0, user.money - amount);
     const data = load();
-    data[userId] = Math.max(0, (data[userId] || 0) - amount);
+    data[userId] = user;
     save(data);
 }
 
@@ -51,3 +76,4 @@ module.exports = {
     addBalance,
     removeBalance
 };
+
