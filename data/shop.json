@@ -1,1 +1,7 @@
-{}
+{
+  "items": [
+    { "id": 1, "name": "VIP 24h", "price": 500 },
+    { "id": 2, "name": "Badge Elite", "price": 250 },
+    { "id": 3, "name": "Couleur pseudo", "price": 1000 }
+  ]
+}
