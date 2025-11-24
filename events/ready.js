@@ -10,6 +10,7 @@ module.exports = {
             { name: 'Effexe - New Era', type: ActivityType.Playing },
             { name: 'Créateur: Enzo', type: ActivityType.Watching },
             { name: 'Utilisez /help', type: ActivityType.Listening },
+            { name: 'Utilisez /Daily', type: ActivityType.Listening },
             { name: '💻 Développement en cours', type: ActivityType.Playing }
         ];
 
@@ -25,3 +26,4 @@ module.exports = {
         }, 5000); // change toutes les 5 secondes
     }
 };
+
