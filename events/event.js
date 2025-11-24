@@ -1,4 +1,4 @@
-const logs = require('./utils/logs'); // ton fichier de logs
+const logs = require('./utils/logger.js'); // ton fichier de logs
 
 module.exports = (client) => {
     // Membre rejoint
