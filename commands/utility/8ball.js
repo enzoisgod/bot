@@ -6,18 +6,14 @@ module.exports = {
         .setDescription('Pose une question et l’Oracle 8ball répond.')
         .addStringOption(option => 
             option.setName('question')
-            .setDescription('Votre question')
-            .setRequired(true)
+                .setDescription('Votre question')
+                .setRequired(true)
         ),
 
     async execute(interaction) {
         const question = interaction.options.getString('question').toLowerCase();
 
-        // Réponse spéciale si "effexe" ou "enzoisgod"
-        if (question.includes("effexe") || question.includes("enzoisgod")) {
-            return interaction.reply(`🎱 Question : ${interaction.options.getString('question')}\nRéponse : **Le meilleur.**`);
-        }
-
+        // Réponses normales
         const answers = [
             "Oui",
             "Non",
@@ -27,8 +23,14 @@ module.exports = {
             "Demande plus tard"
         ];
 
+        // 🔥 CONDITIONS SPÉCIALES
+        if (question.includes("effexe") || question.includes("enzoisgod")) {
+            return interaction.reply(`🎱 Question : ${question}\nRéponse : **Le meilleur.**`);
+        }
+
+        // Réponse normale
         const reply = answers[Math.floor(Math.random() * answers.length)];
 
-        await interaction.reply(`🎱 Question : ${interaction.options.getString('question')}\nRéponse : ${reply}`);
+        return interaction.reply(`🎱 Question : ${question}\nRéponse : ${reply}`);
     }
 };
