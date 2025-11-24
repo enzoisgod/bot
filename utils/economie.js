@@ -1,46 +1,53 @@
 const fs = require('fs');
 const path = require('path');
 
-// Chemin du fichier JSON contenant l'économie
-const ecoFile = path.join(__dirname, '../data/economy.json');
+const filePath = path.join(__dirname, '../data/economie.json');
 
-// Si le fichier n'existe pas, on le crée
-if (!fs.existsSync(ecoFile)) {
-    fs.mkdirSync(path.join(__dirname, '../data'), { recursive: true });
-    fs.writeFileSync(ecoFile, JSON.stringify({}, null, 2));
+// Vérifie que le fichier existe, sinon le créer
+if (!fs.existsSync(filePath)) {
+    fs.writeFileSync(filePath, JSON.stringify({}, null, 4));
 }
 
-// Fonction pour charger les données
-function loadMoney() {
-    return JSON.parse(fs.readFileSync(ecoFile));
+// Charge les données
+function load() {
+    return JSON.parse(fs.readFileSync(filePath));
 }
 
-// Fonction pour sauvegarder les données
-function saveMoney(data) {
-    fs.writeFileSync(ecoFile, JSON.stringify(data, null, 2));
+// Sauvegarde les données
+function save(data) {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
+}
+
+// Récupère le balance d’un utilisateur
+function getBalance(userId) {
+    const data = load();
+    return data[userId] || 0;
+}
+
+// Modifie le balance d’un utilisateur
+function setBalance(userId, amount) {
+    const data = load();
+    data[userId] = amount;
+    save(data);
+}
+
+// Ajoute un montant
+function addBalance(userId, amount) {
+    const data = load();
+    data[userId] = (data[userId] || 0) + amount;
+    save(data);
+}
+
+// Retire un montant
+function removeBalance(userId, amount) {
+    const data = load();
+    data[userId] = Math.max(0, (data[userId] || 0) - amount);
+    save(data);
 }
 
 module.exports = {
-    // Ajouter de l'argent
-    addMoney(userId, amount) {
-        const data = loadMoney();
-        if (!data[userId]) data[userId] = 0;
-        data[userId] += amount;
-        saveMoney(data);
-    },
-
-    // Retirer de l'argent
-    removeMoney(userId, amount) {
-        const data = loadMoney();
-        if (!data[userId]) data[userId] = 0;
-        data[userId] -= amount;
-        if (data[userId] < 0) data[userId] = 0;
-        saveMoney(data);
-    },
-
-    // Obtenir l'argent d'un utilisateur
-    getMoney(userId) {
-        const data = loadMoney();
-        return data[userId] || 0;
-    }
+    getBalance,
+    setBalance,
+    addBalance,
+    removeBalance
 };
