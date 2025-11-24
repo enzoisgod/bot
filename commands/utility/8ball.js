@@ -34,3 +34,4 @@ module.exports = {
         return interaction.reply(`🎱 Question : ${question}\nRéponse : ${reply}`);
     }
 };
+
