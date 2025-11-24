@@ -98,8 +98,27 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 
+const economyPath = path.join(__dirname, "data", "economy.json");
+
+client.economy = {
+    load() {
+        if (!fs.existsSync(economyPath)) return {};
+        return JSON.parse(fs.readFileSync(economyPath));
+    },
+    save(data) {
+        fs.writeFileSync(economyPath, JSON.stringify(data, null, 2));
+    },
+    addMoney(userId, amount) {
+        const data = this.load();
+        if (!data[userId]) data[userId] = { money: 0, lastDaily: null };
+        data[userId].money += amount;
+        this.save(data);
+    }
+};
+
 
 // Login
 client.login(config.token);
+
 
 
