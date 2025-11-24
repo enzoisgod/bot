@@ -25,7 +25,7 @@ module.exports = {
 
         // 🔥 CONDITIONS SPÉCIALES
         if (question.includes("effexe") || question.includes("enzoisgod")) {
-            return interaction.reply(`🎱 Question : ${question}\nRéponse : **Le meilleur.**`);
+            return interaction.reply(`🎱 Question : ${question}\nRéponse : **Je ne suis pas autorisé a repondre concernent mon maitre**`);
         }
 
         // Réponse normale
