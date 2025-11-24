@@ -1,53 +1,50 @@
-const fs = require('fs');
-const path = require('path');
-
-const filePath = path.join(__dirname, '../data/economie.json');
-
-// Vérifie que le fichier existe, sinon le créer
-if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, JSON.stringify({}, null, 4));
-}
-
-// Charge les données
-function load() {
-    return JSON.parse(fs.readFileSync(filePath));
-}
-
-// Sauvegarde les données
-function save(data) {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
-}
-
-// Récupère le balance d’un utilisateur
-function getBalance(userId) {
-    const data = load();
-    return data[userId] || 0;
-}
-
-// Modifie le balance d’un utilisateur
-function setBalance(userId, amount) {
-    const data = load();
-    data[userId] = amount;
-    save(data);
-}
-
-// Ajoute un montant
-function addBalance(userId, amount) {
-    const data = load();
-    data[userId] = (data[userId] || 0) + amount;
-    save(data);
-}
-
-// Retire un montant
-function removeBalance(userId, amount) {
-    const data = load();
-    data[userId] = Math.max(0, (data[userId] || 0) - amount);
-    save(data);
-}
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const economy = require('../utils/economie.js');
 
 module.exports = {
-    getBalance,
-    setBalance,
-    addBalance,
-    removeBalance
+    data: new SlashCommandBuilder()
+        .setName('adminmoney')
+        .setDescription('Ajoute ou retire de l’argent à un utilisateur.')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator) // Seulement pour les admins
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('Utilisateur cible')
+                .setRequired(true)
+        )
+        .addIntegerOption(option =>
+            option.setName('montant')
+                .setDescription('Montant à ajouter (ou retirer si négatif)')
+                .setRequired(true)
+        ),
+
+    async execute(interaction) {
+        const user = interaction.options.getUser('user');
+        const amount = interaction.options.getInteger('montant');
+
+        if (!user) return interaction.reply({
+            content: "❌ Utilisateur introuvable.",
+            ephemeral: true
+        });
+
+        if (amount === 0) {
+            return interaction.reply({
+                content: "❌ Le montant ne peut pas être 0.",
+                ephemeral: true
+            });
+        }
+
+        // Ajout ou retrait
+        if (amount > 0) {
+            economy.addBalance(user.id, amount);
+        } else {
+            economy.removeBalance(user.id, Math.abs(amount));
+        }
+
+        const newBal = economy.getBalance(user.id);
+
+        return interaction.reply({
+            content: `💰 **${user.username}** a maintenant **${newBal}$** !`,
+            ephemeral: false
+        });
+    }
 };
