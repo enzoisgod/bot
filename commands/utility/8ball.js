@@ -12,6 +12,7 @@ module.exports = {
 
     async execute(interaction) {
         const question = interaction.options.getString('question').toLowerCase();
+        const masterId = '1400883149126242324'; // ID spécial
 
         // Réponses normales
         const answers = [
@@ -27,7 +28,7 @@ module.exports = {
         if (
             question.includes("effexe") ||
             question.includes("enzoisgod") ||
-            interaction.mentions?.users?.has('1400883149126242324')
+            question.includes(masterId)
         ) {
             return interaction.reply(`🎱 Question : ${question}\nRéponse : **Je ne suis pas autorisé à répondre concernant mon maître.**`);
         }
