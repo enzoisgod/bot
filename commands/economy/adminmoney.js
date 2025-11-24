@@ -1,44 +1,50 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const eco = require('../../utils/economie');
+const economy = require('../utils/economy.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('adminmoney')
-        .setDescription('Admin : gérer l’argent de quelqu’un')
+        .setDescription('Ajoute ou retire de l’argent à un utilisateur.')
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-        .addUserOption(opt =>
-            opt.setName('membre').setDescription('Membre à modifier').setRequired(true)
-        )
-        .addStringOption(opt =>
-            opt.setName('action')
-                .setDescription('Action à effectuer')
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('Utilisateur cible')
                 .setRequired(true)
-                .addChoices(
-                    { name: 'Ajouter', value: 'add' },
-                    { name: 'Retirer', value: 'remove' },
-                    { name: 'Définir', value: 'set' }
-                )
         )
-        .addIntegerOption(opt =>
-            opt.setName('montant').setDescription('Montant d’argent').setRequired(true)
+        .addIntegerOption(option =>
+            option.setName('montant')
+                .setDescription('Montant à ajouter (ou retirer si négatif)')
+                .setRequired(true)
         ),
 
     async execute(interaction) {
-        const user = interaction.options.getUser('membre');
-        const action = interaction.options.getString('action');
+        const user = interaction.options.getUser('user');
         const amount = interaction.options.getInteger('montant');
 
-        let money = eco.getBalance(user.id);
+        if (!user) return interaction.reply({
+            content: "Utilisateur introuvable.",
+            ephemeral: true
+        });
 
-        if (action === "add") money += amount;
-        if (action === "remove") money = Math.max(money - amount, 0);
-        if (action === "set") money = amount;
+        if (amount === 0) {
+            return interaction.reply({
+                content: "Le montant ne peut pas être 0.",
+                ephemeral: true
+            });
+        }
 
-        eco.setBalance(user.id, money);
+        // ➤ Utilisation CORRECTE de ton système economy
+        if (amount > 0) {
+            economy.addBalance(user.id, amount);
+        } else {
+            economy.removeBalance(user.id, Math.abs(amount));
+        }
+
+        const newBal = economy.getBalance(user.id);
 
         return interaction.reply({
-            content: `💰 **${user.username}** a maintenant **${money}€**.`,
-            ephemeral: true
+            content: `💰 **${user.username}** a maintenant **${newBal}$** !`,
+            ephemeral: false
         });
     }
 };
