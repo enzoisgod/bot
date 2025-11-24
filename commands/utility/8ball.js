@@ -24,8 +24,12 @@ module.exports = {
         ];
 
         // 🔥 CONDITIONS SPÉCIALES
-        if (question.includes("effexe") || question.includes("enzoisgod")) {
-            return interaction.reply(`🎱 Question : ${question}\nRéponse : **Je ne suis pas autorisé a repondre concernent mon maitre**`);
+        if (
+            question.includes("effexe") ||
+            question.includes("enzoisgod") ||
+            interaction.mentions?.users?.has('1400883149126242324')
+        ) {
+            return interaction.reply(`🎱 Question : ${question}\nRéponse : **Je ne suis pas autorisé à répondre concernant mon maître.**`);
         }
 
         // Réponse normale
@@ -34,4 +38,3 @@ module.exports = {
         return interaction.reply(`🎱 Question : ${question}\nRéponse : ${reply}`);
     }
 };
-
