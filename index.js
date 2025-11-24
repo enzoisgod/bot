@@ -16,7 +16,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
-// Load commands
+// ─── Load Commands ───────────────────────────────────────────────
 const commandsPath = path.join(__dirname, 'commands');
 function loadCommands(dir) {
     const files = fs.readdirSync(dir);
@@ -34,7 +34,7 @@ function loadCommands(dir) {
 }
 loadCommands(commandsPath);
 
-// Events
+// ─── Load Events ─────────────────────────────────────────────────
 const eventsPath = path.join(__dirname, 'events');
 for (const file of fs.readdirSync(eventsPath)) {
     if (!file.endsWith('.js')) continue;
@@ -43,7 +43,7 @@ for (const file of fs.readdirSync(eventsPath)) {
     else client.on(evt.name, (...args) => evt.execute(...args, client));
 }
 
-// Slash commands handler
+// ─── Slash Commands Handler ──────────────────────────────────────
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
     const command = client.commands.get(interaction.commandName);
@@ -52,18 +52,16 @@ client.on('interactionCreate', async interaction => {
     try {
         await command.execute(interaction, client, config);
     } catch (err) {
-        console.error(err);
+        console.error("Erreur lors de l'exécution de la commande :", err);
         if (interaction.replied || interaction.deferred)
-            await interaction.followUp({ content: 'Erreur lors de l\'exécution.', ephemeral: true });
+            await interaction.followUp({ content: '❌ Erreur lors de l\'exécution.', ephemeral: true });
         else
-            await interaction.reply({ content: 'Erreur lors de l\'exécution.', ephemeral: true });
+            await interaction.reply({ content: '❌ Erreur lors de l\'exécution.', ephemeral: true });
     }
 });
 
-/* ============================================================
-   ⭐ AUTO-REACTION DANS LE SALON AVIS
-   ============================================================ */
-client.on(Events.MessageCreate, async (message) => {
+// ─── Auto-Reaction et Mention ───────────────────────────────────
+client.on(Events.MessageCreate, async message => {
     if (message.author.bot) return;
 
     if (message.channel.id === process.env.AVIS_CHANNEL_ID) {
@@ -73,10 +71,6 @@ client.on(Events.MessageCreate, async (message) => {
             console.error("Impossible d'ajouter la réaction ⭐ :", err);
         }
     }
-});
-
-client.on(Events.MessageCreate, async (message) => {
-    if (message.author.bot) return;
 
     if (message.mentions.has(client.user) && !message.reference) {
         try {
@@ -87,32 +81,57 @@ client.on(Events.MessageCreate, async (message) => {
     }
 });
 
-// Économie
+// ─── Économie ───────────────────────────────────────────────────
 const economyPath = path.join(__dirname, "data", "economy.json");
+
 client.economy = {
     load() {
-        if (!fs.existsSync(economyPath)) return {};
-        return JSON.parse(fs.readFileSync(economyPath));
+        try {
+            if (!fs.existsSync(economyPath)) return {};
+            return JSON.parse(fs.readFileSync(economyPath));
+        } catch (err) {
+            console.error("Erreur lors du chargement de l'économie :", err);
+            return {};
+        }
     },
     save(data) {
-        fs.writeFileSync(economyPath, JSON.stringify(data, null, 2));
+        try {
+            fs.writeFileSync(economyPath, JSON.stringify(data, null, 2));
+        } catch (err) {
+            console.error("Erreur lors de la sauvegarde de l'économie :", err);
+        }
     },
     addMoney(userId, amount) {
         const data = this.load();
         if (!data[userId]) data[userId] = { money: 0, lastDaily: null };
         data[userId].money += amount;
         this.save(data);
+    },
+    getBalance(userId) {
+        const data = this.load();
+        if (!data[userId]) data[userId] = { money: 0, lastDaily: null };
+        return data[userId].money;
+    },
+    setBalance(userId, amount) {
+        const data = this.load();
+        if (!data[userId]) data[userId] = { money: 0, lastDaily: null };
+        data[userId].money = amount;
+        this.save(data);
+    },
+    removeMoney(userId, amount) {
+        const data = this.load();
+        if (!data[userId]) data[userId] = { money: 0, lastDaily: null };
+        data[userId].money = Math.max(0, data[userId].money - amount);
+        this.save(data);
     }
 };
 
-client.on(Events.MessageCreate, (message) => {
+// Ajoute +5$ par message
+client.on(Events.MessageCreate, message => {
     if (message.author.bot) return;
-    client.economy.addMoney(message.author.id, 5); // +5$ par message
+    client.economy.addMoney(message.author.id, 5);
 });
 
-// Login
+// ─── Login ──────────────────────────────────────────────────────
 client.login(config.token);
-
-
-
 
