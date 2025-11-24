@@ -3,52 +3,42 @@ const path = require('path');
 
 const filePath = path.join(__dirname, '../data/economie.json');
 
-// Vérifie que le fichier existe, sinon le créer proprement
+// Vérifie que le fichier existe, sinon le créer
 if (!fs.existsSync(filePath)) {
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
     fs.writeFileSync(filePath, JSON.stringify({}, null, 4));
 }
 
-// Charge les données (avec protection anti-crash JSON)
+// Charge les données
 function load() {
-    try {
-        const raw = fs.readFileSync(filePath);
-        return JSON.parse(raw);
-    } catch (err) {
-        console.error("❌ ERREUR JSON economy:", err);
-        // reset si JSON corrompu
-        fs.writeFileSync(filePath, JSON.stringify({}, null, 4));
-        return {};
-    }
+    return JSON.parse(fs.readFileSync(filePath));
 }
 
-// Sauvegarde sécurisée
+// Sauvegarde les données
 function save(data) {
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
-    } catch (err) {
-        console.error("❌ ERREUR SAVE economy:", err);
-    }
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 4));
 }
 
-// Balance
+// Récupère le balance d’un utilisateur
 function getBalance(userId) {
     const data = load();
     return data[userId] || 0;
 }
 
+// Modifie le balance d’un utilisateur
 function setBalance(userId, amount) {
     const data = load();
     data[userId] = amount;
     save(data);
 }
 
+// Ajoute un montant
 function addBalance(userId, amount) {
     const data = load();
     data[userId] = (data[userId] || 0) + amount;
     save(data);
 }
 
+// Retire un montant
 function removeBalance(userId, amount) {
     const data = load();
     data[userId] = Math.max(0, (data[userId] || 0) - amount);
