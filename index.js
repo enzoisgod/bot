@@ -116,9 +116,16 @@ client.economy = {
     }
 };
 
+client.on(Events.MessageCreate, (message) => {
+    if (message.author.bot) return;
+
+    client.economy.addMoney(message.author.id, 5); // +5$ par message
+
+});
 
 // Login
 client.login(config.token);
+
 
 
 
