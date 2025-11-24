@@ -2,10 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits, Partials, Events } = require('discord.js');
 require('dotenv').config();
-
 const config = require('./config.js');
-const logger = require('./utils/logger'); // logs
-const autoRole = require('./utils/autorole'); // auto-role
 
 const client = new Client({
     intents: [
@@ -19,9 +16,7 @@ const client = new Client({
 
 client.commands = new Collection();
 
-/* ============================================================
-   COMMANDES
-============================================================ */
+// Load commands
 const commandsPath = path.join(__dirname, 'commands');
 function loadCommands(dir) {
     const files = fs.readdirSync(dir);
@@ -31,35 +26,24 @@ function loadCommands(dir) {
         if (stat.isDirectory()) loadCommands(full);
         else if (file.endsWith('.js')) {
             const cmd = require(full);
-            if (cmd.data && cmd.execute) client.commands.set(cmd.data.name, cmd);
+            if (cmd.data && cmd.execute) {
+                client.commands.set(cmd.data.name, cmd);
+            }
         }
     }
 }
 loadCommands(commandsPath);
 
-/* ============================================================
-   EVENTS DE GUILDE (LOGS + AUTO-ROLE)
-============================================================ */
-client.on(Events.GuildMemberAdd, member => {
-    logger.memberJoin(member);
-    autoRole.check(member);
-});
+// Events
+const eventsPath = path.join(__dirname, 'events');
+for (const file of fs.readdirSync(eventsPath)) {
+    if (!file.endsWith('.js')) continue;
+    const evt = require(path.join(eventsPath, file));
+    if (evt.once) client.once(evt.name, (...args) => evt.execute(...args, client));
+    else client.on(evt.name, (...args) => evt.execute(...args, client));
+}
 
-client.on(Events.GuildMemberRemove, member => {
-    logger.memberLeave(member);
-});
-
-client.on(Events.MessageDelete, message => {
-    logger.messageDelete(message);
-});
-
-client.on(Events.MessageUpdate, (oldMessage, newMessage) => {
-    logger.messageUpdate ? logger.messageUpdate(oldMessage, newMessage) : console.log(`Message édité: ${oldMessage.id}`);
-});
-
-/* ============================================================
-   SLASH COMMANDS
-============================================================ */
+// Slash commands handler
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
     const command = client.commands.get(interaction.commandName);
@@ -77,33 +61,48 @@ client.on('interactionCreate', async interaction => {
 });
 
 /* ============================================================
-   AUTO-REACTION & PING
-============================================================ */
+   ⭐ AUTO-REACTION DANS LE SALON AVIS
+   ============================================================ */
 client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot) return;
 
-    // Salon avis
     if (message.channel.id === process.env.AVIS_CHANNEL_ID) {
-        try { await message.react('⭐'); } catch (err) { console.error(err); }
-    }
-
-    // Ping du bot
-    if (message.mentions.has(client.user) && !message.reference) {
-        try { await message.reply("C'est moi wshh"); } catch (err) { console.error(err); }
+        try {
+            await message.react('⭐');
+        } catch (err) {
+            console.error("Impossible d'ajouter la réaction ⭐ :", err);
+        }
     }
 });
 
-/* ============================================================
-   ECONOMIE
-============================================================ */
-const economyPath = path.join(__dirname, "data", "economy.json");
+client.on(Events.MessageCreate, async (message) => {
+    if (message.author.bot) return;
 
+    if (message.mentions.has(client.user) && !message.reference) {
+        try {
+            await message.reply("C'est moi wshh");
+        } catch (err) {
+            console.error("Impossible de répondre au ping :", err);
+        }
+    }
+});
+
+// Économie
+const economyPath = path.join(__dirname, "data", "economy.json");
 client.economy = {
-    load() { if (!fs.existsSync(economyPath)) return {}; return JSON.parse(fs.readFileSync(economyPath)); },
-    save(data) { fs.writeFileSync(economyPath, JSON.stringify(data, null, 2)); },
-    addMoney(userId, amount) { const data = this.load(); if (!data[userId]) data[userId] = { money: 0, lastDaily: null }; data[userId].money += amount; this.save(data); },
-    getBalance(userId) { const data = this.load(); return data[userId] ? data[userId].money : 0; },
-    setBalance(userId, amount) { const data = this.load(); if (!data[userId]) data[userId] = { money: 0, lastDaily: null }; data[userId].money = amount; this.save(data); }
+    load() {
+        if (!fs.existsSync(economyPath)) return {};
+        return JSON.parse(fs.readFileSync(economyPath));
+    },
+    save(data) {
+        fs.writeFileSync(economyPath, JSON.stringify(data, null, 2));
+    },
+    addMoney(userId, amount) {
+        const data = this.load();
+        if (!data[userId]) data[userId] = { money: 0, lastDaily: null };
+        data[userId].money += amount;
+        this.save(data);
+    }
 };
 
 client.on(Events.MessageCreate, (message) => {
@@ -111,33 +110,8 @@ client.on(Events.MessageCreate, (message) => {
     client.economy.addMoney(message.author.id, 5); // +5$ par message
 });
 
-/* ============================================================
-   READY & ACTIVITE
-============================================================ */
-client.once(Events.ClientReady, () => {
-    console.log(`${client.user.tag} est connecté !`);
-
-    const activities = [
-        { name: 'Effexe Core', type: 'WATCHING' },
-        { name: 'tes commandes', type: 'LISTENING' },
-        { name: 'le serveur', type: 'PLAYING' }
-    ];
-
-    let i = 0;
-    setInterval(() => {
-        const status = activities[i];
-        try { client.user.setActivity(status.name, { type: status.type }); }
-        catch (err) { console.error(err); }
-        i = (i + 1) % activities.length;
-    }, 5000); // change toutes les 5s
-});
-
-/* ============================================================
-   LOGIN
-============================================================ */
+// Login
 client.login(config.token);
-
-
 
 
 
