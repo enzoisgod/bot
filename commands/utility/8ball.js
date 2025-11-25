@@ -27,6 +27,7 @@ module.exports = {
         // 🔥 CONDITIONS SPÉCIALES
         if (
             question.includes("effexe") ||
+            question.includes("enzo") ||
             question.includes("enzoisgod") ||
             question.includes(masterId)
         ) {
