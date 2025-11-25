@@ -1,4 +1,4 @@
-const { Events, ActivityType } = require('discord.js');
+const { Events, ActivityType } = require('discord.js'); 
 
 module.exports = {
     name: Events.ClientReady,
@@ -7,18 +7,22 @@ module.exports = {
         console.log(`${client.user.tag} est prêt !`);
 
         const statuses = [
-            { name: 'Effexe - New Era', type: ActivityType.Playing },
-            { name: 'Créateur: Enzo', type: ActivityType.Watching },
-            { name: 'Utilisez /help', type: ActivityType.Listening },
-            { name: 'Utilisez /Daily', type: ActivityType.Listening },
-            { name: '💻 Développement en cours', type: ActivityType.Playing }
+            { name: 'Effexe - New Era' },
+            { name: 'Créateur: Enzo' },
+            { name: 'Utilisez /help' },
+            { name: 'Utilisez /Daily' },
+            { name: '💻 Développement en cours' }
         ];
 
         let i = 0;
         setInterval(() => {
             try {
                 const status = statuses[i % statuses.length];
-                client.user.setActivity(status.name, { type: status.type });
+                client.user.setActivity({
+                    name: status.name,
+                    type: ActivityType.Streaming,
+                    url: "https://twitch.tv/discord" // OBLIGATOIRE pour le streaming
+                });
                 i++;
             } catch (err) {
                 console.error("Erreur en changeant le statut :", err);
@@ -26,4 +30,3 @@ module.exports = {
         }, 5000); // change toutes les 5 secondes
     }
 };
-
