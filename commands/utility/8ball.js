@@ -29,6 +29,7 @@ module.exports = {
             question.includes("effexe") ||
             question.includes("enzo") || 
             question.includes("𝐄𝐟𝐟𝐞𝐱𝐞") ||
+            question.includes("𝐄𝐧𝐳𝐨") ||
             question.includes("enzoisgod") ||
             question.includes(masterId)
         ) {
